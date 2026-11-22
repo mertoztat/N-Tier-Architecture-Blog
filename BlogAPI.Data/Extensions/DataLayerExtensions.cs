@@ -2,6 +2,7 @@ using BlogAPI.Data.Context;
 using BlogAPI.Data.Repositories.Abstractions;
 using BlogAPI.Data.Repositories.Concretes;
 using BlogAPI.Data.UnitOfWorks;
+using BlogAPI.Entity.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +21,24 @@ public static class DataLayerExtensions
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
         //  Dependency Injection for UnitOfWork
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        // Identity: AddIdentityCore is used instead of AddIdentity because the API authenticates
+        // with JWT and does not need Identity's cookie schemes or SignInManager.
+        services.AddIdentityCore<AppUser>(options =>
+            {
+                options.Password.RequireDigit = true;
+                options.Password.RequiredLength = 6;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireLowercase = false;
+
+                options.User.RequireUniqueEmail = true;
+
+                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+            })
+            .AddRoles<AppRole>()
+            .AddEntityFrameworkStores<AppDbContext>();
 
         return services;
     }
