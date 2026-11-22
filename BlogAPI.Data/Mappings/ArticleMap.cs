@@ -8,6 +8,13 @@ public class ArticleMap : IEntityTypeConfiguration<Article>
 {
     public void Configure(EntityTypeBuilder<Article> builder)
     {
+        // Deleting a user must not delete their articles. Restrict also avoids SQL Server's
+        // "multiple cascade paths" error (Image -> Article and Image -> User -> Article).
+        builder.HasOne(a => a.User)
+            .WithMany(u => u.Articles)
+            .HasForeignKey(a => a.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.HasData(
             new Article
             {

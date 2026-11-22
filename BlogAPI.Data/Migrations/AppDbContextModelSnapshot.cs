@@ -121,7 +121,7 @@ namespace BlogAPI.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("ImageId")
+                    b.Property<Guid?>("ImageId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("LastName")
@@ -582,9 +582,7 @@ namespace BlogAPI.Data.Migrations
                 {
                     b.HasOne("BlogAPI.Entity.Entities.Image", "Image")
                         .WithMany("Users")
-                        .HasForeignKey("ImageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ImageId");
 
                     b.Navigation("Image");
                 });
@@ -648,7 +646,7 @@ namespace BlogAPI.Data.Migrations
                     b.HasOne("BlogAPI.Entity.Entities.AppUser", "User")
                         .WithMany("Articles")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Category");

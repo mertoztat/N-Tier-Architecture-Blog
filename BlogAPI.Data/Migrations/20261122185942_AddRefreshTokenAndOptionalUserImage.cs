@@ -6,11 +6,23 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BlogAPI.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class AddRefreshToken : Migration
+    public partial class AddRefreshTokenAndOptionalUserImage : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_AspNetUsers_Images_ImageId",
+                table: "AspNetUsers");
+
+            migrationBuilder.AlterColumn<Guid>(
+                name: "ImageId",
+                table: "AspNetUsers",
+                type: "uniqueidentifier",
+                nullable: true,
+                oldClrType: typeof(Guid),
+                oldType: "uniqueidentifier");
+
             migrationBuilder.AddColumn<Guid>(
                 name: "UserId",
                 table: "Articles",
@@ -98,7 +110,14 @@ namespace BlogAPI.Data.Migrations
                 column: "UserId",
                 principalTable: "AspNetUsers",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_AspNetUsers_Images_ImageId",
+                table: "AspNetUsers",
+                column: "ImageId",
+                principalTable: "Images",
+                principalColumn: "Id");
         }
 
         /// <inheritdoc />
@@ -107,6 +126,10 @@ namespace BlogAPI.Data.Migrations
             migrationBuilder.DropForeignKey(
                 name: "FK_Articles_AspNetUsers_UserId",
                 table: "Articles");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_AspNetUsers_Images_ImageId",
+                table: "AspNetUsers");
 
             migrationBuilder.DropTable(
                 name: "RefreshTokens");
@@ -118,6 +141,16 @@ namespace BlogAPI.Data.Migrations
             migrationBuilder.DropColumn(
                 name: "UserId",
                 table: "Articles");
+
+            migrationBuilder.AlterColumn<Guid>(
+                name: "ImageId",
+                table: "AspNetUsers",
+                type: "uniqueidentifier",
+                nullable: false,
+                defaultValue: new Guid("00000000-0000-0000-0000-000000000000"),
+                oldClrType: typeof(Guid),
+                oldType: "uniqueidentifier",
+                oldNullable: true);
 
             migrationBuilder.UpdateData(
                 table: "AspNetRoles",
@@ -139,6 +172,14 @@ namespace BlogAPI.Data.Migrations
                 keyValue: new Guid("edf6c246-41d8-475f-8d92-41dddac3aefb"),
                 column: "ConcurrencyStamp",
                 value: "9f1ece17-6c0c-443e-ba2d-be55432d0983");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_AspNetUsers_Images_ImageId",
+                table: "AspNetUsers",
+                column: "ImageId",
+                principalTable: "Images",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
         }
     }
 }

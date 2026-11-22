@@ -10,6 +10,8 @@ namespace BlogAPI.Service.Services.Concretes;
 
 public class AuthService : IAuthService
 {
+    private const string DefaultRole = "User";
+
     private readonly UserManager<AppUser> _userManager;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ITokenService _tokenService;
@@ -25,6 +27,37 @@ public class AuthService : IAuthService
         _unitOfWork = unitOfWork;
         _tokenService = tokenService;
         _jwt = jwtOptions.Value;
+    }
+
+    public async Task<RegisterResultDto> RegisterAsync(RegisterDto registerDto)
+    {
+        var email = registerDto.Email.Trim();
+
+        if (await _userManager.FindByEmailAsync(email) is not null)
+            return new RegisterResultDto { EmailTaken = true, Errors = new[] { "This e-mail address is already registered." } };
+
+        var user = new AppUser
+        {
+            Id = Guid.NewGuid(),
+            UserName = email,
+            Email = email,
+            FirstName = registerDto.FirstName.Trim(),
+            LastName = registerDto.LastName.Trim()
+        };
+
+        var createResult = await _userManager.CreateAsync(user, registerDto.Password);
+        if (!createResult.Succeeded)
+            return new RegisterResultDto { Errors = createResult.Errors.Select(e => e.Description).ToList() };
+
+        var roleResult = await _userManager.AddToRoleAsync(user, DefaultRole);
+        if (!roleResult.Succeeded)
+        {
+            // Do not leave a user without a role behind.
+            await _userManager.DeleteAsync(user);
+            return new RegisterResultDto { Errors = roleResult.Errors.Select(e => e.Description).ToList() };
+        }
+
+        return new RegisterResultDto { Succeeded = true, UserId = user.Id };
     }
 
     public async Task<AuthResultDto?> LoginAsync(LoginDto loginDto)

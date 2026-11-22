@@ -4,6 +4,9 @@ namespace BlogAPI.Service.Services.Abstractions;
 
 public interface IAuthService
 {
+    /// <summary>Creates a new account with the default "User" role. Never grants Admin roles.</summary>
+    Task<RegisterResultDto> RegisterAsync(RegisterDto registerDto);
+
     /// <summary>Returns null when the credentials are wrong or the account is locked.</summary>
     Task<AuthResultDto?> LoginAsync(LoginDto loginDto);
 
