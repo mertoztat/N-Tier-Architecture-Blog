@@ -37,21 +37,21 @@ public class RoleMap : IEntityTypeConfiguration<AppRole>
                 Id = Guid.Parse("16EA936C-7A28-4C30-86A2-9A9704B6115E"),
                 Name = "Superadmin",
                 NormalizedName = "SUPERADMIN",
-                ConcurrencyStamp = Guid.NewGuid().ToString()
+                ConcurrencyStamp = "4C7A1E20-8B3D-4F5A-9C61-2D0E7B8A1F01"
             },
             new AppRole
             {
                 Id = Guid.Parse("7CB750CF-3612-4FB4-9F7D-A38BA8F16BF4"),
                 Name = "Admin",
                 NormalizedName = "ADMIN",
-                ConcurrencyStamp = Guid.NewGuid().ToString()
+                ConcurrencyStamp = "4C7A1E20-8B3D-4F5A-9C61-2D0E7B8A1F02"
             },
             new AppRole
             {
                 Id = Guid.Parse("EDF6C246-41D8-475F-8D92-41DDDAC3AEFB"),
                 Name = "User",
                 NormalizedName = "USER",
-                ConcurrencyStamp = Guid.NewGuid().ToString()
+                ConcurrencyStamp = "4C7A1E20-8B3D-4F5A-9C61-2D0E7B8A1F03"
             });
         }
     }

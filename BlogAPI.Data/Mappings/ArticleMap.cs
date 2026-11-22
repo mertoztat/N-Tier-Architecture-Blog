@@ -20,7 +20,7 @@ public class ArticleMap : IEntityTypeConfiguration<Article>
                 CreatedBy = "Mert",
                 CreatedDate = new DateTime(2026, 1, 1),
                 IsDeleted = false,
-                UserId = Guid.Parse("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee")
+                UserId = Guid.Parse("CB94223B-CCB8-4F2F-93D7-0DF96A7F065C")
             },
             new Article
             {
@@ -33,7 +33,7 @@ public class ArticleMap : IEntityTypeConfiguration<Article>
                 CreatedBy = "Mert",
                 CreatedDate = new DateTime(2026, 1, 1),
                 IsDeleted = false,
-                UserId = Guid.Parse("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee")
+                UserId = Guid.Parse("CB94223B-CCB8-4F2F-93D7-0DF96A7F065C")
             });
     }
 }

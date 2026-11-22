@@ -53,21 +53,21 @@ namespace BlogAPI.Data.Migrations
                         new
                         {
                             Id = new Guid("16ea936c-7a28-4c30-86a2-9a9704b6115e"),
-                            ConcurrencyStamp = "9e10b163-f585-4602-b34c-8420afb09a47",
+                            ConcurrencyStamp = "4C7A1E20-8B3D-4F5A-9C61-2D0E7B8A1F01",
                             Name = "Superadmin",
                             NormalizedName = "SUPERADMIN"
                         },
                         new
                         {
                             Id = new Guid("7cb750cf-3612-4fb4-9f7d-a38ba8f16bf4"),
-                            ConcurrencyStamp = "0b69fc89-036f-4bab-929e-459c6e94098c",
+                            ConcurrencyStamp = "4C7A1E20-8B3D-4F5A-9C61-2D0E7B8A1F02",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = new Guid("edf6c246-41d8-475f-8d92-41dddac3aefb"),
-                            ConcurrencyStamp = "9f1ece17-6c0c-443e-ba2d-be55432d0983",
+                            ConcurrencyStamp = "4C7A1E20-8B3D-4F5A-9C61-2D0E7B8A1F03",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -353,6 +353,9 @@ namespace BlogAPI.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("ViewCount")
                         .HasColumnType("int");
 
@@ -361,6 +364,8 @@ namespace BlogAPI.Data.Migrations
                     b.HasIndex("CategoryId");
 
                     b.HasIndex("ImageId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Articles");
 
@@ -375,6 +380,7 @@ namespace BlogAPI.Data.Migrations
                             ImageId = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
                             IsDeleted = false,
                             Title = "First Article",
+                            UserId = new Guid("cb94223b-ccb8-4f2f-93d7-0df96a7f065c"),
                             ViewCount = 100
                         },
                         new
@@ -387,6 +393,7 @@ namespace BlogAPI.Data.Migrations
                             ImageId = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
                             IsDeleted = false,
                             Title = "Second Article",
+                            UserId = new Guid("cb94223b-ccb8-4f2f-93d7-0df96a7f065c"),
                             ViewCount = 200
                         });
                 });
@@ -525,6 +532,43 @@ namespace BlogAPI.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("BlogAPI.Entity.Entities.RefreshToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReplacedByTokenHash")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<DateTime?>("RevokedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens");
+                });
+
             modelBuilder.Entity("BlogAPI.Entity.Entities.AppRoleClaim", b =>
                 {
                     b.HasOne("BlogAPI.Entity.Entities.AppRole", null)
@@ -537,7 +581,7 @@ namespace BlogAPI.Data.Migrations
             modelBuilder.Entity("BlogAPI.Entity.Entities.AppUser", b =>
                 {
                     b.HasOne("BlogAPI.Entity.Entities.Image", "Image")
-                        .WithMany()
+                        .WithMany("Users")
                         .HasForeignKey("ImageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -601,9 +645,33 @@ namespace BlogAPI.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("BlogAPI.Entity.Entities.AppUser", "User")
+                        .WithMany("Articles")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Category");
 
                     b.Navigation("Image");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BlogAPI.Entity.Entities.RefreshToken", b =>
+                {
+                    b.HasOne("BlogAPI.Entity.Entities.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BlogAPI.Entity.Entities.AppUser", b =>
+                {
+                    b.Navigation("Articles");
                 });
 
             modelBuilder.Entity("BlogAPI.Entity.Entities.Category", b =>
@@ -614,6 +682,8 @@ namespace BlogAPI.Data.Migrations
             modelBuilder.Entity("BlogAPI.Entity.Entities.Image", b =>
                 {
                     b.Navigation("Articles");
+
+                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }
