@@ -15,7 +15,7 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.LoadDataLayer(builder.Configuration);
-        builder.Services.LoadServiceLayer();
+        builder.Services.LoadServiceLayer(builder.Configuration);
         builder.Services.AddSession();
         
         builder.Services.AddIdentity<AppUser, AppRole>(opt =>
