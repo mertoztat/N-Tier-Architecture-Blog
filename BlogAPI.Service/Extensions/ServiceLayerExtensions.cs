@@ -19,6 +19,8 @@ public static class ServiceLayerExtensions
             .ValidateOnStart();
 
         services.AddScoped<IArticleService, ArticleService>();
+        services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<IAuthService, AuthService>();
         services.AddAutoMapper(assembly);
 
         return services;
