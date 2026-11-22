@@ -1,0 +1,16 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+
+## IDE
+.idea/
+.vs/
+.vscode/
+
+## OS
+.DS_Store
+
+## Secrets (contains DB credentials; see appsettings.example.json)
+BlogAPI/appsettings.json
