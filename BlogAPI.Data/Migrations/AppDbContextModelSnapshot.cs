@@ -337,7 +337,7 @@ namespace BlogAPI.Data.Migrations
                     b.Property<DateTime?>("DeletedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("ImageId")
+                    b.Property<Guid?>("ImageId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsDeleted")
@@ -639,9 +639,7 @@ namespace BlogAPI.Data.Migrations
 
                     b.HasOne("BlogAPI.Entity.Entities.Image", "Image")
                         .WithMany("Articles")
-                        .HasForeignKey("ImageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ImageId");
 
                     b.HasOne("BlogAPI.Entity.Entities.AppUser", "User")
                         .WithMany("Articles")

@@ -1,3 +1,5 @@
+using BlogAPI.Entity.Dtos.Category;
+
 namespace BlogAPI.Entity.Dtos.Articles;
 
 public class ArticleDto
@@ -7,5 +9,6 @@ public class ArticleDto
  public string Content { get; set; }
  public int ViewCount { get; set; }
  public string CreatedBy { get; set; }
+ public CategoryDto Category { get; set; }
  public DateTime CreatedDate { get; set; }
 }

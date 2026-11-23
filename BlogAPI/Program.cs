@@ -1,4 +1,7 @@
+using BlogAPI.Core.Services;
 using BlogAPI.Data.Extensions;
+using BlogAPI.Middlewares;
+using BlogAPI.Services;
 using BlogAPI.Data.Repositories.Abstractions;
 using BlogAPI.Data.Repositories.Concretes;
 using System.Text;
@@ -17,6 +20,14 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+        // Current user (from JWT claims): used by AppDbContext for audit fields and by services for ownership checks.
+        builder.Services.AddHttpContextAccessor();
+        builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+
+        // Converts AppExceptions (NotFound, Forbidden, BadRequest) into ProblemDetails responses.
+        builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+        builder.Services.AddProblemDetails();
+
         builder.Services.LoadDataLayer(builder.Configuration);
         builder.Services.LoadServiceLayer(builder.Configuration);
         builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
@@ -86,6 +97,8 @@ public class Program
         });
   
         var app = builder.Build();
+
+        app.UseExceptionHandler();
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
