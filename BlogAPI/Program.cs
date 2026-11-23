@@ -27,7 +27,28 @@ public class Program
 
         // Converts AppExceptions (NotFound, Forbidden, BadRequest) into ProblemDetails responses.
         builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-        builder.Services.AddProblemDetails();
+        // Every error response has the same shape: a Turkish "title" per status code, the actual message
+        // in "detail", and field errors in "errors" (validation only). Applies to Problem()/ValidationProblem(),
+        // [ApiController] 400s, ValidationFilter and GlobalExceptionHandler alike.
+        builder.Services.AddProblemDetails(options =>
+        {
+            options.CustomizeProblemDetails = context =>
+            {
+                var problem = context.ProblemDetails;
+                problem.Title = problem is HttpValidationProblemDetails
+                    ? "Bir veya daha fazla doğrulama hatası oluştu."
+                    : problem.Status switch
+                    {
+                        StatusCodes.Status400BadRequest => "Geçersiz istek",
+                        StatusCodes.Status401Unauthorized => "Yetkisiz erişim",
+                        StatusCodes.Status403Forbidden => "Erişim reddedildi",
+                        StatusCodes.Status404NotFound => "Bulunamadı",
+                        StatusCodes.Status409Conflict => "Çakışma",
+                        StatusCodes.Status500InternalServerError => "Sunucu hatası",
+                        _ => problem.Title
+                    };
+            };
+        });
 
         builder.Services.LoadDataLayer(builder.Configuration);
         builder.Services.LoadServiceLayer(builder.Configuration);

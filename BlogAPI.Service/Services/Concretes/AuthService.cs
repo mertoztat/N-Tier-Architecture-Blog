@@ -34,7 +34,7 @@ public class AuthService : IAuthService
         var email = registerDto.Email.Trim();
 
         if (await _userManager.FindByEmailAsync(email) is not null)
-            return new RegisterResultDto { EmailTaken = true, Errors = new[] { "This e-mail address is already registered." } };
+            return new RegisterResultDto { EmailTaken = true, Errors = new[] { "Bu e-posta adresi zaten kayıtlı." } };
 
         var user = new AppUser
         {

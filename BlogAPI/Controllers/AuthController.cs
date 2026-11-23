@@ -34,15 +34,14 @@ public class AuthController : ControllerBase
         var result = await _authService.RegisterAsync(registerDto);
 
         if (result.EmailTaken)
-            return Conflict(new ProblemDetails { Title = "E-mail address is already registered.", Status = 409 });
+            return Problem(detail: "Bu e-posta adresi zaten kayıtlı.", statusCode: StatusCodes.Status409Conflict);
 
         if (!result.Succeeded)
         {
-            var problem = new ValidationProblemDetails(new Dictionary<string, string[]>
-            {
-                ["errors"] = result.Errors.ToArray()
-            }) { Status = 400 };
-            return BadRequest(problem);
+            // Identity errors (e.g. password rules) in the same "errors" format as FluentValidation.
+            foreach (var error in result.Errors)
+                ModelState.AddModelError("password", error);
+            return ValidationProblem(ModelState);
         }
 
         return StatusCode(StatusCodes.Status201Created, new { result.UserId });
@@ -56,7 +55,7 @@ public class AuthController : ControllerBase
     {
         var result = await _authService.LoginAsync(loginDto);
         if (result is null)
-            return Unauthorized(new ProblemDetails { Title = "Invalid email or password.", Status = 401 });
+            return Problem(detail: "E-posta veya şifre hatalı.", statusCode: StatusCodes.Status401Unauthorized);
 
         SetRefreshTokenCookie(result);
         return Ok(ToTokenDto(result));
@@ -69,13 +68,13 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Refresh()
     {
         if (!Request.Cookies.TryGetValue(RefreshTokenCookie, out var refreshToken) || string.IsNullOrEmpty(refreshToken))
-            return Unauthorized(new ProblemDetails { Title = "Refresh token is missing.", Status = 401 });
+            return Problem(detail: "Oturum bilgisi bulunamadı. Lütfen tekrar giriş yapın.", statusCode: StatusCodes.Status401Unauthorized);
 
         var result = await _authService.RefreshAsync(refreshToken);
         if (result is null)
         {
             DeleteRefreshTokenCookie();
-            return Unauthorized(new ProblemDetails { Title = "Refresh token is invalid or expired.", Status = 401 });
+            return Problem(detail: "Oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.", statusCode: StatusCodes.Status401Unauthorized);
         }
 
         SetRefreshTokenCookie(result);

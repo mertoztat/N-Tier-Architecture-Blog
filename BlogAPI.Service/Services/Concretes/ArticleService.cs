@@ -90,7 +90,7 @@ public class ArticleService : IArticleService
     private async Task<Article> GetActiveArticleAsync(Guid id)
     {
         return await _unitOfWork.GetRepository<Article>().GetAsync(x => x.Id == id && !x.IsDeleted)
-               ?? throw new NotFoundException($"Article '{id}' was not found.");
+               ?? throw new NotFoundException("Makale bulunamadı.");
     }
 
     /// <summary>Only the author, an Admin or a Superadmin may change or delete an article.</summary>
@@ -101,7 +101,7 @@ public class ArticleService : IArticleService
 
         if (!isOwner && !isAdmin)
         {
-            throw new ForbiddenException("You can only modify your own articles.");
+            throw new ForbiddenException("Yalnızca kendi makalelerinizi düzenleyebilir veya silebilirsiniz.");
         }
     }
 
@@ -110,7 +110,7 @@ public class ArticleService : IArticleService
         var exists = await _unitOfWork.GetRepository<Category>().AnyAsync(x => x.Id == categoryId && !x.IsDeleted);
         if (!exists)
         {
-            throw new BadRequestException($"Category '{categoryId}' does not exist.");
+            throw new BadRequestException("Seçilen kategori bulunamadı.");
         }
     }
 }
