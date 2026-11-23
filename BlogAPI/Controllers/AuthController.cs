@@ -1,5 +1,5 @@
-using System.Security.Claims;
 using BlogAPI.Entity.Dtos.Auth;
+using BlogAPI.Service.Extensions;
 using BlogAPI.Service.Options;
 using BlogAPI.Service.Services.Abstractions;
 using Microsoft.AspNetCore.Authorization;
@@ -101,10 +101,10 @@ public class AuthController : ControllerBase
     {
         return Ok(new
         {
-            Id = User.FindFirstValue(ClaimTypes.NameIdentifier),
-            Name = User.FindFirstValue(ClaimTypes.Name),
-            Email = User.FindFirstValue(ClaimTypes.Email),
-            Roles = User.FindAll(ClaimTypes.Role).Select(c => c.Value)
+            Id = User.GetLoggedInUserId(),
+            Name = User.GetLoggedInUserName(),
+            Email = User.GetLoggedInUserEmail(),
+            Roles = User.GetLoggedInUserRoles()
         });
     }
 
