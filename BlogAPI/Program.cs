@@ -1,5 +1,6 @@
 using BlogAPI.Core.Services;
 using BlogAPI.Data.Extensions;
+using BlogAPI.Filters;
 using BlogAPI.Middlewares;
 using BlogAPI.Services;
 using BlogAPI.Data.Repositories.Abstractions;
@@ -70,7 +71,14 @@ public class Program
                 .AllowCredentials());
         });
 
-        builder.Services.AddControllers();
+        builder.Services.AddControllers(options =>
+        {
+            // Runs FluentValidation validators for action arguments (see Filters/ValidationFilter.cs).
+            options.Filters.Add<ValidationFilter>();
+            // Validation lives in FluentValidation; don't let MVC add its own English
+            // "field is required" errors just because a property is a non-nullable string.
+            options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
+        });
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(options =>
