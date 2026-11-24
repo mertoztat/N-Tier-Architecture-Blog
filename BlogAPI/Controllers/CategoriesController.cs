@@ -1,3 +1,4 @@
+using BlogAPI.Entity.Dtos.Category;
 using BlogAPI.Service.Services.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,5 +23,30 @@ public class CategoriesController : ControllerBase
     {
         var categories = await _categoryService.GetAllCategoriesNonDeletedAsync();
         return Ok(categories);
+    }
+
+    // Managing categories is restricted to Admin / Superadmin (same roles as ArticleService's override rule).
+    [HttpPost]
+    [Authorize(Roles = "Admin,Superadmin")]
+    public async Task<IActionResult> Create(CategoryAddDto dto)
+    {
+        var category = await _categoryService.CreateCategoryAsync(dto);
+        return StatusCode(StatusCodes.Status201Created, category);
+    }
+
+    [HttpPut("{id:guid}")]
+    [Authorize(Roles = "Admin,Superadmin")]
+    public async Task<IActionResult> Update(Guid id, CategoryUpdateDto dto)
+    {
+        await _categoryService.UpdateCategoryAsync(id, dto);
+        return NoContent();
+    }
+
+    [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "Admin,Superadmin")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        await _categoryService.SafeDeleteCategoryAsync(id);
+        return NoContent();
     }
 }

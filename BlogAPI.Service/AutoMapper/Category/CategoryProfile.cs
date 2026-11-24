@@ -8,5 +8,7 @@ public class CategoryProfile : Profile
     {
         // Mapping configuration for Category and CategoryDto
         CreateMap<CategoryDto, Entity.Entities.Category>().ReverseMap();
+        CreateMap<CategoryAddDto, Entity.Entities.Category>();
+        CreateMap<CategoryUpdateDto, Entity.Entities.Category>();
     }
 }
