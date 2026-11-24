@@ -10,5 +10,7 @@ public class ArticleDto
  public int ViewCount { get; set; }
  public string CreatedBy { get; set; }
  public CategoryDto Category { get; set; }
+ // Relative path under /images, e.g. "article-images/baslik_123.jpg"; null when the article has no photo.
+ public string? ImageFileName { get; set; }
  public DateTime CreatedDate { get; set; }
 }

@@ -8,7 +8,12 @@
     <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="8.0.34" />
   </ItemGroup>
 
-  <PropertyGroup>
+  <ItemGroup>
+    <!-- ASP.NET Core types such as IFormFile (image upload) -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+<PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>

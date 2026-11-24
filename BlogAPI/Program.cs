@@ -5,7 +5,9 @@ using BlogAPI.Middlewares;
 using BlogAPI.Services;
 using BlogAPI.Data.Repositories.Abstractions;
 using BlogAPI.Data.Repositories.Concretes;
+using System.Security.Claims;
 using System.Text;
+using System.Threading.RateLimiting;
 using BlogAPI.Service.Extensions;
 using BlogAPI.Service.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -92,6 +94,31 @@ public class Program
                 .AllowCredentials());
         });
 
+        // Max 5 article creations per minute per user (per IP if somehow unauthenticated).
+        builder.Services.AddRateLimiter(options =>
+        {
+            options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+            options.AddPolicy("ArticleCreate", context => RateLimitPartition.GetFixedWindowLimiter(
+                context.User.FindFirstValue(ClaimTypes.NameIdentifier)
+                    ?? context.Connection.RemoteIpAddress?.ToString() ?? "anonymous",
+                _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 5,
+                    Window = TimeSpan.FromMinutes(1),
+                    QueueLimit = 0
+                }));
+            options.OnRejected = async (context, token) =>
+            {
+                context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+                await context.HttpContext.Response.WriteAsJsonAsync(new
+                {
+                    title = "Çok fazla istek",
+                    status = 429,
+                    detail = "Çok sık makale oluşturuyorsunuz. Lütfen biraz bekleyip tekrar deneyin."
+                }, token);
+            };
+        });
+
         builder.Services.AddControllers(options =>
         {
             // Runs FluentValidation validators for action arguments (see Filters/ValidationFilter.cs).
@@ -137,11 +164,15 @@ public class Program
         }
 
         app.UseHttpsRedirection();
+        // Serves wwwroot/images/... (uploaded article photos).
+        app.UseStaticFiles();
 
         app.UseCors("Frontend");
 
         app.UseAuthentication();
         app.UseAuthorization();
+        // After authentication so the limiter can partition by user.
+        app.UseRateLimiter();
 
 
         app.MapControllers();

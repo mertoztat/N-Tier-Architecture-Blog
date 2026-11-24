@@ -28,3 +28,8 @@ public class BadRequestException : AppException
 {
     public BadRequestException(string message) : base(message, 400) { }
 }
+
+public class ConflictException : AppException
+{
+    public ConflictException(string message) : base(message, 409) { }
+}

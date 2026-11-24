@@ -2,6 +2,7 @@ using BlogAPI.Entity.Dtos.Articles;
 using BlogAPI.Service.Services.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace BlogAPI.Controllers;
 
@@ -27,7 +28,8 @@ public class ArticlesController : ControllerBase
 
     [HttpPost]
     [Authorize]
-    public async Task<IActionResult> Create(ArticleAddDto dto)
+    [EnableRateLimiting("ArticleCreate")]
+    public async Task<IActionResult> Create([FromForm] ArticleAddDto dto)
     {
         var article = await _articleService.CreateArticleAsync(dto);
         return StatusCode(StatusCodes.Status201Created, article);
@@ -35,7 +37,7 @@ public class ArticlesController : ControllerBase
 
     [HttpPut("{id:guid}")]
     [Authorize]
-    public async Task<IActionResult> Update(Guid id, ArticleUpdateDto dto)
+    public async Task<IActionResult> Update(Guid id, [FromForm] ArticleUpdateDto dto)
     {
         await _articleService.UpdateArticleAsync(id, dto);
         return NoContent();

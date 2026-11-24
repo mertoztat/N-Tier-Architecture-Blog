@@ -1,4 +1,5 @@
 using BlogAPI.Entity.Dtos.Articles;
+using BlogAPI.Service.FluentValidations.Common;
 using FluentValidation;
 
 namespace BlogAPI.Service.FluentValidations.Articles;
@@ -9,6 +10,11 @@ public class ArticleAddDtoValidator : AbstractValidator<ArticleAddDto>
 {
     public ArticleAddDtoValidator()
     {
+        // Photo is optional; the rules only run when one is sent.
+        RuleFor(x => x.Photo)
+            .SetValidator(new ArticlePhotoValidator())
+            .When(x => x.Photo is not null);
+
         RuleFor(x => x.Title)
             .NotEmpty()
             .MaximumLength(200)

@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
+using BlogAPI.Service.Helpers.Images;
 using FluentValidation;
 using BlogAPI.Service.Options;
 using BlogAPI.Service.Services.Abstractions;
@@ -23,6 +24,7 @@ public static class ServiceLayerExtensions
 
         services.AddScoped<IArticleService, ArticleService>();
         services.AddScoped<ICategoryService, CategoryService>();
+        services.AddScoped<IImageHelper, ImageHelper>();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddAutoMapper(assembly);

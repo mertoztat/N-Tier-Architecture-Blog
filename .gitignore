@@ -14,3 +14,7 @@ obj/
 
 ## Secrets (contains DB credentials; see appsettings.example.json)
 BlogAPI/appsettings.json
+
+# Uploaded images
+BlogAPI/wwwroot/images/*
+!BlogAPI/wwwroot/images/.gitkeep
