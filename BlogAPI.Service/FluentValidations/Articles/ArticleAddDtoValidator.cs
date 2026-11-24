@@ -12,7 +12,7 @@ public class ArticleAddDtoValidator : AbstractValidator<ArticleAddDto>
     {
         // Photo is optional; the rules only run when one is sent.
         RuleFor(x => x.Photo)
-            .SetValidator(new ArticlePhotoValidator())
+            .SetValidator(new ImageFileValidator())
             .When(x => x.Photo is not null);
 
         RuleFor(x => x.Title)

@@ -3,14 +3,14 @@ using Microsoft.AspNetCore.Http;
 
 namespace BlogAPI.Service.FluentValidations.Common;
 
-// Shared by ArticleAddDtoValidator and ArticleUpdateDtoValidator.
-public class ArticlePhotoValidator : AbstractValidator<IFormFile>
+// Shared by the article and profile photo validators.
+public class ImageFileValidator : AbstractValidator<IFormFile>
 {
     private const long MaxPhotoBytes = 5 * 1024 * 1024; // 5 MB
     private static readonly string[] AllowedExtensions = { ".jpg", ".jpeg", ".png", ".webp" };
     private static readonly string[] AllowedContentTypes = { "image/jpeg", "image/png", "image/webp" };
 
-    public ArticlePhotoValidator()
+    public ImageFileValidator()
     {
         RuleFor(x => x.Length)
             .GreaterThan(0).WithMessage("Görsel dosyası boş olamaz.")

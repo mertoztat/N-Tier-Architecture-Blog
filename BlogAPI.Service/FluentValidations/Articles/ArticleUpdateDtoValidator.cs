@@ -10,7 +10,7 @@ public class ArticleUpdateDtoValidator : AbstractValidator<ArticleUpdateDto>
     {
         // Photo is optional; when omitted the article keeps its current image.
         RuleFor(x => x.Photo)
-            .SetValidator(new ArticlePhotoValidator())
+            .SetValidator(new ImageFileValidator())
             .When(x => x.Photo is not null);
 
         RuleFor(x => x.Title)
