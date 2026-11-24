@@ -26,6 +26,15 @@ public class ArticlesController : ControllerBase
         return Ok(articles);
     }
 
+    // Public, like the list. Every call counts as one view.
+    [HttpGet("{id:guid}")]
+    [EnableRateLimiting("ArticleView")]
+    public async Task<IActionResult> GetById(Guid id)
+    {
+        var article = await _articleService.GetArticleByIdAsync(id);
+        return Ok(article);
+    }
+
     [HttpPost]
     [Authorize]
     [EnableRateLimiting("ArticleCreate")]

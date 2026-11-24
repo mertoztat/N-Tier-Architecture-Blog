@@ -107,6 +107,16 @@ public class Program
                     Window = TimeSpan.FromMinutes(1),
                     QueueLimit = 0
                 }));
+            // Detail page: max 5 views per 5 minute per visitor (IP) and article, so refreshing the page
+            // in a loop cannot inflate ViewCount. Reading other articles is not affected.
+            options.AddPolicy("ArticleView", context => RateLimitPartition.GetFixedWindowLimiter(
+                $"{context.Connection.RemoteIpAddress}|{context.Request.RouteValues["id"]}",
+                _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 5,
+                    Window = TimeSpan.FromMinutes(5),
+                    QueueLimit = 0
+                }));
             options.OnRejected = async (context, token) =>
             {
                 context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
@@ -114,7 +124,7 @@ public class Program
                 {
                     title = "Çok fazla istek",
                     status = 429,
-                    detail = "Çok sık makale oluşturuyorsunuz. Lütfen biraz bekleyip tekrar deneyin."
+                    detail = "Çok fazla istek gönderdiniz. Lütfen biraz bekleyip tekrar deneyin."
                 }, token);
             };
         });

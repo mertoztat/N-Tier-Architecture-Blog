@@ -36,6 +36,20 @@ public class ArticleService : IArticleService
         return articlesDto;
     }
 
+    public async Task<ArticleDto> GetArticleByIdAsync(Guid id)
+    {
+        var repository = _unitOfWork.GetRepository<Article>();
+        var article = await repository.GetAsync(x => x.Id == id && !x.IsDeleted, x => x.Category, x => x.Image!)
+                      ?? throw new NotFoundException("Makale bulunamadı.");
+
+        // The article is tracked, so SaveAsync writes only the changed ViewCount column.
+        // Two simultaneous reads can count as one view; that is fine for a view counter.
+        article.ViewCount++;
+        await _unitOfWork.SaveAsync();
+
+        return _mapper.Map<ArticleDto>(article);
+    }
+
     public async Task<ArticleDto> CreateArticleAsync(ArticleAddDto dto)
     {
         // The endpoint requires [Authorize]; a missing user here is a programming error, hence a 500.
